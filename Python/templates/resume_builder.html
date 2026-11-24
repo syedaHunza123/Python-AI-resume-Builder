@@ -1,0 +1,391 @@
+{% extends 'base.html' %}
+
+{% block title %}Resume Builder – {{ resume.title }} – ResumeAI{% endblock %}
+
+{% block extra_head %}
+<!-- Injected initial JSON for client script -->
+<script type="application/json" id="initial-resume-data">
+  {{ resume_json | safe }}
+</script>
+{% endblock %}
+
+{% block body_content %}
+<div class="d-flex flex-column min-vh-100">
+  <!-- Top Action Navigation Bar -->
+  <header class="glass-header py-2 px-4 d-flex align-items-center justify-content-between sticky-top">
+    <div class="d-flex align-items-center gap-3">
+      <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary btn-sm" title="Back to Dashboard">
+        <i class="fa-solid fa-arrow-left"></i>
+      </a>
+      <div>
+        <input type="text" id="input-title" class="form-control form-control-sm fw-bold border-0 bg-transparent px-1" value="{{ resume.title }}" style="font-size: 1.05rem; max-width: 280px;" placeholder="Resume Title">
+      </div>
+      <span class="badge gradient-badge d-none d-md-inline-block">{{ resume.template|capitalize }}</span>
+    </div>
+
+    <!-- Actions (Save, AI Review, Preview, PDF Export) -->
+    <div class="d-flex align-items-center gap-2">
+      <!-- AI Assistant Button -->
+      <button type="button" class="btn btn-outline-primary btn-sm" onclick="aiReviewResume()">
+        <i class="fa-solid fa-wand-magic-sparkles text-primary me-1"></i> AI Review
+      </button>
+
+      <!-- Save Button -->
+      <button type="button" id="btn-save-resume" class="btn btn-primary btn-sm" onclick="saveResumeToServer()">
+        <i class="fa-solid fa-floppy-disk me-1"></i> Save Changes
+      </button>
+
+      <!-- Preview Link -->
+      <a href="{{ url_for('resume_preview', resume_id=resume.id) }}" target="_blank" class="btn btn-outline-secondary btn-sm" title="Full Screen Preview">
+        <i class="fa-solid fa-eye me-1"></i> Preview
+      </a>
+
+      <!-- Download PDF -->
+      <a href="{{ url_for('export_pdf', resume_id=resume.id) }}" class="btn btn-outline-success btn-sm" title="Download PDF">
+        <i class="fa-solid fa-download me-1"></i> Download PDF
+      </a>
+    </div>
+  </header>
+
+  <!-- Split Screen: Wizard Left, Real-Time A4 Live Preview Right -->
+  <div class="container-fluid flex-grow-1 p-0">
+    <div class="row g-0 flex-grow-1">
+      
+      <!-- LEFT COLUMN: Step-by-Step Wizard -->
+      <div class="col-lg-6 col-xl-5 border-end d-flex flex-column bg-card" style="height: calc(100vh - 60px); overflow-y: auto;">
+        
+        <!-- Wizard Navigation Pills -->
+        <div class="wizard-step-header sticky-top">
+          <div class="wizard-nav-pills">
+            <div class="step-pill active" data-step="1" onclick="goToStep(1)">1. Personal</div>
+            <div class="step-pill" data-step="2" onclick="goToStep(2)">2. Summary</div>
+            <div class="step-pill" data-step="3" onclick="goToStep(3)">3. Experience</div>
+            <div class="step-pill" data-step="4" onclick="goToStep(4)">4. Education</div>
+            <div class="step-pill" data-step="5" onclick="goToStep(5)">5. Skills</div>
+            <div class="step-pill" data-step="6" onclick="goToStep(6)">6. Projects</div>
+            <div class="step-pill" data-step="7" onclick="goToStep(7)">7. Certifications</div>
+            <div class="step-pill" data-step="8" onclick="goToStep(8)">8. Languages</div>
+          </div>
+        </div>
+
+        <div class="p-4 flex-grow-1">
+          <!-- Step 1: Personal Information -->
+          <div id="step-content-1" class="wizard-section">
+            <h5 class="fw-bold mb-1">Step 1: Personal Information</h5>
+            <p class="text-muted small mb-3">Add your contact details and professional profiles.</p>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Full Name *</label>
+                <input type="text" id="pi-fullname" class="form-control" placeholder="Alex Morgan">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Professional Title *</label>
+                <input type="text" id="pi-title" class="form-control" placeholder="Senior Software Engineer">
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Email Address *</label>
+                <input type="email" id="pi-email" class="form-control" placeholder="alex.morgan@example.com">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Phone Number</label>
+                <input type="text" id="pi-phone" class="form-control" placeholder="+1 (555) 019-2834">
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Location / City</label>
+                <input type="text" id="pi-location" class="form-control" placeholder="San Francisco, CA">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-semibold">Target Job Role</label>
+                <input type="text" id="input-target-role" class="form-control" placeholder="Engineering Lead">
+              </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">LinkedIn URL</label>
+                <input type="text" id="pi-linkedin" class="form-control form-control-sm" placeholder="linkedin.com/in/alex">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">GitHub URL</label>
+                <input type="text" id="pi-github" class="form-control form-control-sm" placeholder="github.com/alex">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label small fw-semibold">Portfolio Website</label>
+                <input type="text" id="pi-portfolio" class="form-control form-control-sm" placeholder="alexmorgan.dev">
+              </div>
+            </div>
+
+            <!-- Profile Photo Upload -->
+            <div class="card-saas p-3 mb-4">
+              <label class="form-label small fw-semibold">Profile Photo (Optional)</label>
+              <div class="d-flex align-items-center gap-3">
+                <img id="photo-preview-img" src="" class="rounded-circle border d-none" style="width: 50px; height: 50px; object-fit: cover;">
+                <input type="file" id="photo-file-input" class="form-control form-control-sm" accept="image/*">
+                <span id="photo-spinner" class="d-none text-primary"><i class="fa-solid fa-spinner ai-spin"></i></span>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-end">
+              <button type="button" class="btn btn-primary" onclick="nextStep()">
+                Next: Professional Summary <i class="fa-solid fa-arrow-right ms-1"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 2: Professional Summary -->
+          <div id="step-content-2" class="wizard-section d-none">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h5 class="fw-bold mb-0">Step 2: Professional Summary</h5>
+              <button type="button" id="btn-ai-summary" class="btn btn-outline-primary btn-sm" onclick="aiGenerateSummary()">
+                <i class="fa-solid fa-wand-magic-sparkles me-1"></i> Generate with AI
+              </button>
+            </div>
+            <p class="text-muted small mb-3">
+              Summarize your career highlights in 3-4 sentences. Click "Generate with AI" to automatically synthesize your summary from your verified skills and titles.
+            </p>
+
+            <div class="mb-4">
+              <textarea id="pi-summary" class="form-control" rows="8" placeholder="Results-driven professional with proven experience in delivering scalable software..."></textarea>
+            </div>
+
+            <div class="d-flex justify-content-between">
+              <button type="button" class="btn btn-outline-secondary" onclick="prevStep()">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back
+              </button>
+              <button type="button" class="btn btn-primary" onclick="nextStep()">
+                Next: Work Experience <i class="fa-solid fa-arrow-right ms-1"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 3: Work Experience -->
+          <div id="step-content-3" class="wizard-section d-none">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h5 class="fw-bold mb-0">Step 3: Work Experience</h5>
+              <button type="button" class="btn btn-outline-primary btn-sm" onclick="addWorkExp()">
+                <i class="fa-solid fa-plus me-1"></i> Add Position
+              </button>
+            </div>
+            <p class="text-muted small mb-3">
+              Add your previous work history. Click "AI Improve" on any position to enhance your bullet points with strong action verbs.
+            </p>
+
+            <div id="work-experience-list"></div>
+
+            <div class="d-flex justify-content-between mt-3">
+              <button type="button" class="btn btn-outline-secondary" onclick="prevStep()">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back
+              </button>
+              <button type="button" class="btn btn-primary" onclick="nextStep()">
+                Next: Education <i class="fa-solid fa-arrow-right ms-1"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 4: Education -->
+          <div id="step-content-4" class="wizard-section d-none">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h5 class="fw-bold mb-0">Step 4: Education</h5>
+              <button type="button" class="btn btn-outline-primary btn-sm" onclick="addEducation()">
+                <i class="fa-solid fa-plus me-1"></i> Add Degree
+              </button>
+            </div>
+            <p class="text-muted small mb-3">Detail your degrees, universities, graduation years, and GPAs.</p>
+
+            <div id="education-list"></div>
+
+            <div class="d-flex justify-content-between mt-3">
+              <button type="button" class="btn btn-outline-secondary" onclick="prevStep()">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back
+              </button>
+              <button type="button" class="btn btn-primary" onclick="nextStep()">
+                Next: Skills <i class="fa-solid fa-arrow-right ms-1"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 5: Skills -->
+          <div id="step-content-5" class="wizard-section d-none">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h5 class="fw-bold mb-0">Step 5: Skills</h5>
+              <button type="button" id="btn-ai-skills" class="btn btn-outline-primary btn-sm" onclick="aiSuggestSkills()">
+                <i class="fa-solid fa-lightbulb me-1"></i> AI Skills Suggestions
+              </button>
+            </div>
+            <p class="text-muted small mb-3">Categorize your technical, soft, programming, and tooling competencies.</p>
+
+            <!-- Add Skill Input Group -->
+            <div class="input-group mb-3">
+              <input type="text" id="new-skill-input" class="form-control" placeholder="Add skill (e.g. Python, Docker, Agile)" onkeydown="if(event.key==='Enter'){event.preventDefault();addSkillFromInput();}">
+              <select id="new-skill-cat" class="form-select" style="max-width: 140px;">
+                <option value="technical">Technical</option>
+                <option value="soft">Soft Skill</option>
+                <option value="programming">Language</option>
+                <option value="tools">Tool</option>
+              </select>
+              <button type="button" class="btn btn-primary" onclick="addSkillFromInput()">
+                <i class="fa-solid fa-plus"></i> Add
+              </button>
+            </div>
+
+            <!-- Chips Container -->
+            <div id="skills-chips-container" class="p-3 border rounded bg-light-subtle mb-4 min-vh-20"></div>
+
+            <div class="d-flex justify-content-between">
+              <button type="button" class="btn btn-outline-secondary" onclick="prevStep()">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back
+              </button>
+              <button type="button" class="btn btn-primary" onclick="nextStep()">
+                Next: Projects <i class="fa-solid fa-arrow-right ms-1"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 6: Projects -->
+          <div id="step-content-6" class="wizard-section d-none">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h5 class="fw-bold mb-0">Step 6: Projects</h5>
+              <button type="button" class="btn btn-outline-primary btn-sm" onclick="addProject()">
+                <i class="fa-solid fa-plus me-1"></i> Add Project
+              </button>
+            </div>
+            <p class="text-muted small mb-3">Highlight personal initiatives, open-source work, and key accomplishments.</p>
+
+            <div id="projects-list"></div>
+
+            <div class="d-flex justify-content-between mt-3">
+              <button type="button" class="btn btn-outline-secondary" onclick="prevStep()">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back
+              </button>
+              <button type="button" class="btn btn-primary" onclick="nextStep()">
+                Next: Certifications <i class="fa-solid fa-arrow-right ms-1"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 7: Certifications -->
+          <div id="step-content-7" class="wizard-section d-none">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h5 class="fw-bold mb-0">Step 7: Certifications</h5>
+              <button type="button" class="btn btn-outline-primary btn-sm" onclick="addCertification()">
+                <i class="fa-solid fa-plus me-1"></i> Add Certification
+              </button>
+            </div>
+            <p class="text-muted small mb-3">Add professional licenses, credentials, and accredited certifications.</p>
+
+            <div id="certifications-list"></div>
+
+            <div class="d-flex justify-content-between mt-3">
+              <button type="button" class="btn btn-outline-secondary" onclick="prevStep()">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back
+              </button>
+              <button type="button" class="btn btn-primary" onclick="nextStep()">
+                Next: Languages <i class="fa-solid fa-arrow-right ms-1"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Step 8: Languages -->
+          <div id="step-content-8" class="wizard-section d-none">
+            <div class="d-flex align-items-center justify-content-between mb-2">
+              <h5 class="fw-bold mb-0">Step 8: Languages</h5>
+              <button type="button" class="btn btn-outline-primary btn-sm" onclick="addLanguage()">
+                <i class="fa-solid fa-plus me-1"></i> Add Language
+              </button>
+            </div>
+            <p class="text-muted small mb-3">List spoken languages and proficiency levels.</p>
+
+            <div id="languages-list"></div>
+
+            <div class="card-saas p-3 mt-4 bg-light-subtle">
+              <h6 class="fw-bold mb-2">Resume Formatting & Theme Settings</h6>
+              <div class="row g-2">
+                <div class="col-md-6">
+                  <label class="form-label small">Resume Template</label>
+                  <select id="select-template" class="form-select form-select-sm">
+                    <option value="modern">Modern Professional</option>
+                    <option value="minimal">Minimal Clean</option>
+                    <option value="corporate">Corporate Executive</option>
+                    <option value="creative">Creative Dynamic</option>
+                    <option value="technical">Developer / Technical</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small">Accent Color</label>
+                  <input type="color" id="input-accent-color" class="form-control form-control-color w-100" value="{{ resume.accent_color or '#6366f1' }}">
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+              <button type="button" class="btn btn-outline-secondary" onclick="prevStep()">
+                <i class="fa-solid fa-arrow-left me-1"></i> Back
+              </button>
+              <button type="button" class="btn btn-success" onclick="saveResumeToServer()">
+                <i class="fa-solid fa-check me-1"></i> Finish & Save Resume
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN: Real-Time Live A4 Preview Canvas -->
+      <div class="col-lg-6 col-xl-7 d-flex flex-column" style="height: calc(100vh - 60px);">
+        <!-- Preview Control Strip -->
+        <div class="bg-dark text-light p-2 px-3 d-flex align-items-center justify-content-between small">
+          <div class="d-flex align-items-center gap-2">
+            <span class="rounded-circle bg-success d-inline-block" style="width: 8px; height: 8px;"></span>
+            <span>Live A4 Preview (Auto-Updating)</span>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-light py-0" onclick="window.print()">
+              <i class="fa-solid fa-print me-1"></i> Print
+            </button>
+          </div>
+        </div>
+
+        <!-- Scrollable Canvas Area -->
+        <div class="resume-paper-container flex-grow-1">
+          <div id="resume-paper" class="resume-paper tpl-{{ resume.template }}">
+            <div id="resume-live-preview">
+              <!-- Dynamically populated by script.js -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- AI Review Modal -->
+<div class="modal fade" id="aiReviewModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="card-saas modal-content">
+      <div class="modal-header border-bottom">
+        <h5 class="modal-title fw-bold d-flex align-items-center gap-2">
+          <i class="fa-solid fa-wand-magic-sparkles text-primary"></i> Senior AI Recruiter Feedback
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body p-4" id="ai-review-content">
+        <!-- Rendered by aiReviewResume() in script.js -->
+      </div>
+      <div class="modal-footer border-top">
+        <button type="button" class="btn btn-primary btn-sm" data-bs-dismiss="modal">Apply Feedback</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+{% endblock %}

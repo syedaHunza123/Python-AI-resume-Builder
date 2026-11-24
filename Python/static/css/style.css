@@ -1,0 +1,326 @@
+/* ResumeAI - Modern SaaS CSS Design System */
+:root {
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --primary-light: #e0e7ff;
+  --secondary: #8b5cf6;
+  --accent: #06b6d4;
+  --bg-main: #f8fafc;
+  --bg-card: #ffffff;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border-color: #e2e8f0;
+  --sidebar-width: 260px;
+  --navbar-height: 70px;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+}
+
+[data-bs-theme="dark"] {
+  --primary: #818cf8;
+  --primary-hover: #6366f1;
+  --primary-light: rgba(99, 102, 241, 0.15);
+  --secondary: #a78bfa;
+  --bg-main: #0b0f19;
+  --bg-card: #131b2e;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --border-color: #1e293b;
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  min-height: 100vh;
+  margin: 0;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+/* Glassmorphism & SaaS Accents */
+.glass-header {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-color);
+}
+[data-bs-theme="dark"] .glass-header {
+  background: rgba(19, 27, 46, 0.85);
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.gradient-badge {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(168, 85, 247, 0.12));
+  color: var(--primary);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+/* Custom SaaS Buttons */
+.btn-primary {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  border: none;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  padding: 0.6rem 1.4rem;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.35);
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #4f46e5 0%, #4338ca 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px 0 rgba(99, 102, 241, 0.45);
+}
+
+.btn-outline-primary {
+  color: var(--primary);
+  border-color: var(--primary);
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+.btn-outline-primary:hover {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+/* Cards */
+.card-saas {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.25s ease;
+}
+.card-saas:hover {
+  border-color: rgba(99, 102, 241, 0.3);
+  box-shadow: var(--shadow-md);
+}
+
+/* Dashboard Layout */
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.app-sidebar {
+  width: var(--sidebar-width);
+  background-color: var(--bg-card);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1020;
+  transition: transform 0.3s ease;
+}
+
+.app-main {
+  flex: 1;
+  margin-left: var(--sidebar-width);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100vh;
+}
+
+@media (max-width: 991.98px) {
+  .app-sidebar {
+    transform: translateX(-100%);
+  }
+  .app-sidebar.show {
+    transform: translateX(0);
+  }
+  .app-main {
+    margin-left: 0;
+  }
+}
+
+.sidebar-nav .nav-link {
+  color: var(--text-muted);
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: 0.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.2s ease;
+}
+.sidebar-nav .nav-link:hover {
+  color: var(--primary);
+  background-color: var(--primary-light);
+}
+.sidebar-nav .nav-link.active {
+  color: var(--primary);
+  background-color: var(--primary-light);
+  font-weight: 600;
+}
+
+/* Builder Wizard Styles */
+.wizard-step-header {
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-card);
+  padding: 1rem 1.5rem;
+}
+
+.wizard-nav-pills {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.wizard-nav-pills .step-pill {
+  white-space: nowrap;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-main);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.wizard-nav-pills .step-pill.active {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+.wizard-nav-pills .step-pill.completed {
+  border-color: #10b981;
+  color: #10b981;
+}
+
+/* Form Styles */
+.form-control, .form-select {
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  padding: 0.6rem 0.85rem;
+}
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+/* Resume Paper Preview in A4 Aspect Ratio */
+.resume-paper-container {
+  background: #525659;
+  padding: 2rem;
+  overflow-y: auto;
+  max-height: calc(100vh - 120px);
+  display: flex;
+  justify-content: center;
+}
+
+.resume-paper {
+  width: 210mm;
+  min-height: 297mm;
+  background: #ffffff;
+  color: #1e293b;
+  padding: 18mm 18mm;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+  font-size: 13px;
+  line-height: 1.5;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+@media (max-width: 1200px) {
+  .resume-paper {
+    width: 100%;
+    min-height: auto;
+    padding: 15px;
+  }
+}
+
+/* Dynamic Live Resume Preview Template Stylings */
+.resume-paper.tpl-modern {
+  border-top: 6px solid var(--resume-accent, #6366f1);
+}
+.resume-paper.tpl-minimal {
+  font-family: 'Georgia', serif;
+}
+.resume-paper.tpl-corporate {
+  border-left: 12px solid #1e293b;
+}
+.resume-paper.tpl-creative {
+  background: linear-gradient(to right, #fcfcfd, #ffffff);
+}
+.resume-paper.tpl-technical {
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* ATS Checker Score Meter */
+.score-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: conic-gradient(var(--primary) calc(var(--score, 0) * 1%), var(--border-color) 0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.score-circle-inner {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+/* AI Assistant Spinner & Toast */
+.ai-spin {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+/* Print CSS */
+@media print {
+  body {
+    background: transparent !important;
+  }
+  .no-print, .app-sidebar, .glass-header, .btn, .alert {
+    display: none !important;
+  }
+  .app-main {
+    margin-left: 0 !important;
+  }
+  .resume-paper-container {
+    background: transparent !important;
+    padding: 0 !important;
+  }
+  .resume-paper {
+    box-shadow: none !important;
+    width: 100% !important;
+    padding: 0 !important;
+  }
+}

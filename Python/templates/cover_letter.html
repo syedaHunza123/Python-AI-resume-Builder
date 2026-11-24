@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Cover Letter Generator – ResumeAI{% endblock %}
+
+{% block body_content %}
+<div class="app-layout">
+  <!-- Collapsible Sidebar -->
+  <aside class="app-sidebar shadow-sm" id="sidebar">
+    <div class="p-4 border-bottom d-flex align-items-center justify-content-between">
+      <a class="d-flex align-items-center gap-2 fw-bold text-decoration-none text-main" href="{{ url_for('dashboard') }}">
+        <div class="rounded-3 bg-primary text-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </div>
+        <span class="fs-5">Resume<span class="text-primary">AI</span></span>
+      </a>
+      <button class="btn btn-sm btn-light d-lg-none" onclick="toggleSidebar()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="p-3 flex-grow-1 overflow-auto">
+      <div class="sidebar-nav">
+        <a href="{{ url_for('dashboard') }}" class="nav-link">
+          <i class="fa-solid fa-table-columns"></i> Dashboard
+        </a>
+        <a href="{{ url_for('resume_create') }}" class="nav-link">
+          <i class="fa-solid fa-circle-plus"></i> Create Resume
+        </a>
+        <a href="{{ url_for('template_gallery') }}" class="nav-link">
+          <i class="fa-solid fa-layer-group"></i> Resume Templates
+        </a>
+        <a href="{{ url_for('ats_checker') }}" class="nav-link">
+          <i class="fa-solid fa-magnifying-glass-chart"></i> ATS Checker
+        </a>
+        <a href="{{ url_for('cover_letter') }}" class="nav-link active">
+          <i class="fa-solid fa-envelope-open-text"></i> Cover Letter AI
+        </a>
+        <a href="{{ url_for('settings') }}" class="nav-link">
+          <i class="fa-solid fa-gear"></i> Settings
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="app-main">
+    <header class="glass-header py-3 px-4 d-flex align-items-center justify-content-between sticky-top">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-outline-secondary btn-sm d-lg-none" onclick="toggleSidebar()">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <h5 class="fw-bold mb-0">AI Cover Letter Generator</h5>
+      </div>
+    </header>
+
+    <div class="p-4 max-w-1200 mx-auto">
+      <div class="row g-4">
+        <!-- Generator Form -->
+        <div class="col-lg-5">
+          <div class="card-saas p-4">
+            <h5 class="fw-bold mb-2">Generate Tailored Letter</h5>
+            <p class="text-muted small mb-4">
+              Our AI pairs your saved resume experiences with the company's job details to craft a compelling cover letter.
+            </p>
+
+            <form method="POST" action="{{ url_for('cover_letter') }}">
+              <input type="hidden" name="action" value="generate">
+
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Connect to Saved Resume (Optional)</label>
+                <select name="resume_id" class="form-select">
+                  <option value="">-- None (Use General Profile) --</option>
+                  {% for r in resumes %}
+                    <option value="{{ r.id }}" {% if selected_resume_id == (r.id|string) %}selected{% endif %}>{{ r.title }}</option>
+                  {% endfor %}
+                </select>
+                <div class="form-text small">Allows AI to reference your verified experience.</div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Target Job Title *</label>
+                <input type="text" name="job_title" class="form-control" placeholder="e.g. Senior Software Engineer" value="{{ job_title or '' }}" required>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Target Company Name *</label>
+                <input type="text" name="company_name" class="form-control" placeholder="e.g. Stripe, Google, Acme Inc." value="{{ company_name or '' }}" required>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Hiring Manager / Recruiter Name (Optional)</label>
+                <input type="text" name="recipient_name" class="form-control" placeholder="e.g. Jane Smith, Hiring Team" value="{{ recipient_name or '' }}">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Job Description / Requirements (Optional)</label>
+                <textarea name="job_description" class="form-control" rows="4" placeholder="Paste specific role responsibilities...">{{ job_description or '' }}</textarea>
+              </div>
+
+              <button type="submit" class="btn btn-primary w-100 py-2">
+                <i class="fa-solid fa-wand-magic-sparkles me-2"></i> Generate Cover Letter
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Letter Editor & Preview -->
+        <div class="col-lg-7">
+          <div class="card-saas p-4">
+            <div class="d-flex align-items-center justify-content-between mb-3 border-bottom pb-3">
+              <h5 class="fw-bold mb-0">Cover Letter Document</h5>
+              {% if is_demo %}
+                <span class="badge bg-warning-subtle text-warning border border-warning-subtle">Demo Mode</span>
+              {% endif %}
+            </div>
+
+            {% if generated_letter %}
+              <form method="POST" action="{{ url_for('cover_letter') }}">
+                <input type="hidden" name="action" value="save">
+                <input type="hidden" name="job_title" value="{{ job_title }}">
+                <input type="hidden" name="company_name" value="{{ company_name }}">
+                <input type="hidden" name="recipient_name" value="{{ recipient_name }}">
+                <input type="hidden" name="resume_id" value="{{ selected_resume_id or '' }}">
+
+                <div class="mb-3">
+                  <textarea name="content" class="form-control font-monospace" rows="18" style="font-size: 13px; line-height: 1.6;">{{ generated_letter }}</textarea>
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="text-muted small">You can edit the text directly before saving.</span>
+                  <button type="submit" class="btn btn-success">
+                    <i class="fa-solid fa-floppy-disk me-1"></i> Save to Account
+                  </button>
+                </div>
+              </form>
+            {% else %}
+              <div class="p-5 text-center text-muted">
+                <i class="fa-solid fa-envelope-open-text fs-1 mb-3 text-primary opacity-50"></i>
+                <h6>Ready to write your letter</h6>
+                <p class="small">Fill in the job details on the left and click "Generate Cover Letter".</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('show');
+  }
+</script>
+{% endblock %}

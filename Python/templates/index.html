@@ -1,0 +1,507 @@
+{% extends 'base.html' %}
+
+{% block title %}ResumeAI – AI-Powered Resume Builder{% endblock %}
+
+{% block body_content %}
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg glass-header fixed-top">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="{{ url_for('index') }}">
+      <div class="rounded-3 bg-primary text-white d-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+      </div>
+      <span class="fs-4">Resume<span class="text-primary">AI</span></span>
+    </a>
+
+    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarContent">
+      <ul class="navbar-nav mx-auto mb-2 mb-lg-0 gap-lg-3">
+        <li class="nav-item"><a class="nav-link" href="#how-it-works">How It Works</a></li>
+        <li class="nav-item"><a class="nav-link" href="#templates">Templates</a></li>
+        <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+        <li class="nav-item"><a class="nav-link" href="#ats">ATS Checker</a></li>
+        <li class="nav-item"><a class="nav-link" href="#faq">FAQ</a></li>
+      </ul>
+
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-outline-secondary border-0 btn-sm rounded-circle p-2" onclick="toggleTheme()" title="Toggle Theme">
+          <i class="fa-solid fa-moon theme-icon"></i>
+        </button>
+        {% if session.get('user_id') %}
+          <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+            <i class="fa-solid fa-table-columns me-1"></i> Dashboard
+          </a>
+        {% else %}
+          <a href="{{ url_for('login') }}" class="btn btn-outline-primary">Sign In</a>
+          <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started Free</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="py-5 mt-5 position-relative overflow-hidden">
+  <div class="container py-5">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <div class="badge gradient-badge px-3 py-2 rounded-pill mb-3">
+          <i class="fa-solid fa-sparkles me-1 text-primary"></i> Next-Gen AI Resume Engine
+        </div>
+        <h1 class="display-4 fw-bold lh-sm mb-4">
+          Build Your Professional Resume with <span class="gradient-text">AI</span>
+        </h1>
+        <p class="lead text-muted mb-4">
+          Create an impressive, job-ready resume in minutes with AI-powered assistance. ATS-optimized templates, smart content enhancement, and instant PDF download.
+        </p>
+
+        <div class="d-flex flex-wrap gap-3 mb-5">
+          <a href="{{ url_for('register') if not session.get('user_id') else url_for('dashboard') }}" class="btn btn-primary btn-lg px-4">
+            <i class="fa-solid fa-arrow-right me-2"></i> Get Started Free
+          </a>
+          <a href="#templates" class="btn btn-outline-primary btn-lg px-4">
+            <i class="fa-solid fa-layer-group me-2"></i> View Templates
+          </a>
+        </div>
+
+        <div class="d-flex align-items-center gap-4 text-muted small">
+          <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-check text-success"></i> 5 ATS Templates
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-check text-success"></i> OpenRouter AI Powered
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-check text-success"></i> Instant PDF Export
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="position-relative">
+          <div class="card-saas p-4 rounded-4 shadow-lg border">
+            <div class="d-flex justify-content-between align-items-center pb-3 border-bottom mb-3">
+              <div class="d-flex align-items-center gap-2">
+                <span class="rounded-circle bg-danger d-inline-block" style="width: 10px; height: 10px;"></span>
+                <span class="rounded-circle bg-warning d-inline-block" style="width: 10px; height: 10px;"></span>
+                <span class="rounded-circle bg-success d-inline-block" style="width: 10px; height: 10px;"></span>
+                <span class="text-muted ms-2 small fw-semibold">Live AI Assistant</span>
+              </div>
+              <span class="badge bg-success-subtle text-success border border-success-subtle">ATS Score: 94/100</span>
+            </div>
+            
+            <div class="bg-light-subtle p-3 rounded-3 mb-3 border">
+              <div class="d-flex align-items-center justify-content-between mb-2">
+                <div class="fw-bold fs-5 text-primary">Alex Morgan</div>
+                <span class="badge bg-primary-subtle text-primary">Senior Software Engineer</span>
+              </div>
+              <p class="small text-muted mb-2">
+                Spearheaded the cloud migration of high-throughput distributed microservices, achieving 99.99% uptime and reducing monthly latency by 35%.
+              </p>
+              <div class="d-flex flex-wrap gap-1">
+                <span class="badge bg-secondary-subtle text-secondary small">Python</span>
+                <span class="badge bg-secondary-subtle text-secondary small">Flask</span>
+                <span class="badge bg-secondary-subtle text-secondary small">PostgreSQL</span>
+                <span class="badge bg-secondary-subtle text-secondary small">Docker</span>
+                <span class="badge bg-secondary-subtle text-secondary small">AWS</span>
+              </div>
+            </div>
+
+            <div class="p-3 rounded-3 border bg-primary-subtle border-primary-subtle d-flex align-items-center gap-3">
+              <i class="fa-solid fa-robot text-primary fs-3"></i>
+              <div class="small">
+                <strong>AI Feedback:</strong> "Strong quantifiable metrics and clean keyword alignment. Resume is primed for engineering leadership roles."
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section id="how-it-works" class="py-5 bg-card">
+  <div class="container py-4">
+    <div class="text-center max-w-700 mx-auto mb-5">
+      <span class="badge gradient-badge px-3 py-2 rounded-pill mb-2">Simple 3-Step Process</span>
+      <h2 class="fw-bold">How ResumeAI Works</h2>
+      <p class="text-muted">Generate a resume that catches recruiters' attention in under 5 minutes.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card-saas h-100 p-4 text-center">
+          <div class="rounded-circle bg-primary-light text-primary mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+            <i class="fa-solid fa-keyboard fs-4"></i>
+          </div>
+          <h5 class="fw-bold">1. Enter Your Details</h5>
+          <p class="text-muted small">Input your career background, education, and target roles through our clean step-by-step wizard.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card-saas h-100 p-4 text-center">
+          <div class="rounded-circle bg-primary-light text-primary mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+            <i class="fa-solid fa-wand-magic-sparkles fs-4"></i>
+          </div>
+          <h5 class="fw-bold">2. Enhance with AI</h5>
+          <p class="text-muted small">Use integrated OpenRouter AI to write impactful summaries, improve work achievements, and suggest industry skills.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card-saas h-100 p-4 text-center">
+          <div class="rounded-circle bg-primary-light text-primary mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
+            <i class="fa-solid fa-file-arrow-down fs-4"></i>
+          </div>
+          <h5 class="fw-bold">3. Check ATS & Export</h5>
+          <p class="text-muted small">Review your ATS compatibility score against target job descriptions and download a high-res PDF instantly.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Resume Templates Section -->
+<section id="templates" class="py-5">
+  <div class="container py-4">
+    <div class="text-center mb-5">
+      <span class="badge gradient-badge px-3 py-2 rounded-pill mb-2">Field Tested</span>
+      <h2 class="fw-bold">5 Professional Resume Templates</h2>
+      <p class="text-muted">Crafted to pass recruiter screenings and Applicant Tracking Systems seamlessly.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card-saas overflow-hidden h-100">
+          <div class="p-3 bg-light border-bottom text-center">
+            <div class="p-3 bg-white shadow-sm border rounded" style="min-height: 180px;">
+              <div class="h-2 bg-primary rounded w-25 mb-2"></div>
+              <h6 class="fw-bold text-start mb-1 text-primary">Alex Morgan</h6>
+              <div class="small text-muted text-start mb-2">Full Stack Engineer</div>
+              <div class="bg-light rounded p-2 text-start small mb-1">■ Lead Backend Developer (2022-Present)</div>
+              <div class="bg-light rounded p-2 text-start small">■ Education: B.S. Computer Science</div>
+            </div>
+          </div>
+          <div class="p-4">
+            <h5 class="fw-bold">Modern Professional</h5>
+            <p class="text-muted small">Polished header accents, clean hierarchy, and balanced whitespace. Great for tech, management, and business.</p>
+            <a href="{{ url_for('resume_create', template='modern') }}" class="btn btn-outline-primary btn-sm w-100">Use Template</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card-saas overflow-hidden h-100">
+          <div class="p-3 bg-light border-bottom text-center">
+            <div class="p-3 bg-white shadow-sm border rounded font-monospace" style="min-height: 180px;">
+              <h6 class="fw-bold text-center mb-1">ALEX MORGAN</h6>
+              <div class="small text-muted text-center mb-2">Software Engineer | Boston, MA</div>
+              <hr class="my-1">
+              <div class="small text-start">EXPERIENCE: Tech Lead @ Acme Corp</div>
+              <div class="small text-start">SKILLS: Python, SQL, REST APIs</div>
+            </div>
+          </div>
+          <div class="p-4">
+            <h5 class="fw-bold">Minimal Clean</h5>
+            <p class="text-muted small">Strictly structured, timeless typography optimized for 100% ATS readability across traditional corporate firms.</p>
+            <a href="{{ url_for('resume_create', template='minimal') }}" class="btn btn-outline-primary btn-sm w-100">Use Template</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card-saas overflow-hidden h-100">
+          <div class="p-3 bg-light border-bottom text-center">
+            <div class="p-3 bg-white shadow-sm border-start border-4 border-dark rounded text-start" style="min-height: 180px;">
+              <h6 class="fw-bold mb-1">Alex Morgan</h6>
+              <div class="badge bg-dark mb-2">Corporate Leader</div>
+              <div class="small text-muted">■ Director of Operations & Strategy</div>
+              <div class="small text-muted">■ M.B.A. Finance & Strategy</div>
+            </div>
+          </div>
+          <div class="p-4">
+            <h5 class="fw-bold">Corporate Executive</h5>
+            <p class="text-muted small">Authoritative dark accents with prominent section dividers. Best suited for consulting, finance, and leadership.</p>
+            <a href="{{ url_for('resume_create', template='corporate') }}" class="btn btn-outline-primary btn-sm w-100">Use Template</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-6">
+        <div class="card-saas overflow-hidden h-100">
+          <div class="p-3 bg-light border-bottom text-center">
+            <div class="p-3 bg-white shadow-sm border rounded text-start" style="min-height: 160px;">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h6 class="fw-bold text-primary mb-0">Alex Morgan</h6>
+                <span class="badge bg-primary-subtle text-primary">UI / UX Designer</span>
+              </div>
+              <div class="small text-muted">Creative portfolio integration, dynamic skills badges and visual flair.</div>
+            </div>
+          </div>
+          <div class="p-4">
+            <h5 class="fw-bold">Creative Dynamic</h5>
+            <p class="text-muted small">Designed for designers, marketers, and creative professionals who want to highlight aesthetic touch while maintaining clean PDF readability.</p>
+            <a href="{{ url_for('resume_create', template='creative') }}" class="btn btn-outline-primary btn-sm w-100">Use Template</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-lg-6">
+        <div class="card-saas overflow-hidden h-100">
+          <div class="p-3 bg-light border-bottom text-center">
+            <div class="p-3 bg-dark text-light shadow-sm rounded text-start font-monospace small" style="min-height: 160px;">
+              <div class="text-success">$ alex --skills --github</div>
+              <div>Stack: Python, Docker, React, AWS, Linux</div>
+              <div>Projects: Open-source CLI, Distributed Cache</div>
+            </div>
+          </div>
+          <div class="p-4">
+            <h5 class="fw-bold">Developer / Technical</h5>
+            <p class="text-muted small">Engineered specifically for developers, systems architects, and data scientists with tech stack chips and project repository links.</p>
+            <a href="{{ url_for('resume_create', template='technical') }}" class="btn btn-outline-primary btn-sm w-100">Use Template</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="py-5 bg-card">
+  <div class="container py-4">
+    <div class="text-center max-w-700 mx-auto mb-5">
+      <span class="badge gradient-badge px-3 py-2 rounded-pill mb-2">Capabilities</span>
+      <h2 class="fw-bold">Powerful AI-Driven Resume Engineering</h2>
+      <p class="text-muted">Everything you need to land interviews at top companies.</p>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card-saas p-4 h-100">
+          <i class="fa-solid fa-pen-nib text-primary fs-3 mb-3"></i>
+          <h5 class="fw-bold">AI Summary Generator</h5>
+          <p class="text-muted small">Craft concise, impactful 3-sentence executive summaries tailored specifically to your genuine skills and career trajectory.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card-saas p-4 h-100">
+          <i class="fa-solid fa-bolt text-warning fs-3 mb-3"></i>
+          <h5 class="fw-bold">Experience Bullet Improver</h5>
+          <p class="text-muted small">Transform passive duty statements into high-impact accomplishment bullets backed by strong active verbs.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card-saas p-4 h-100">
+          <i class="fa-solid fa-envelope-open-text text-success fs-3 mb-3"></i>
+          <h5 class="fw-bold">AI Cover Letter Generator</h5>
+          <p class="text-muted small">Generate tailored, persuasive cover letters directly matching your resume history with specific job postings.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card-saas p-4 h-100">
+          <i class="fa-solid fa-bullseye text-danger fs-3 mb-3"></i>
+          <h5 class="fw-bold">ATS Scanner & Keyword Matcher</h5>
+          <p class="text-muted small">Upload existing resumes to detect missing sections, parse keywords, and compare keyword coverage against job specs.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card-saas p-4 h-100">
+          <i class="fa-solid fa-eye text-info fs-3 mb-3"></i>
+          <h5 class="fw-bold">Real-Time Live Preview</h5>
+          <p class="text-muted small">Every keystroke in the builder dynamically renders in the A4 live preview panel so you know exactly what your resume looks like.</p>
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="card-saas p-4 h-100">
+          <i class="fa-solid fa-shield-halved text-secondary fs-3 mb-3"></i>
+          <h5 class="fw-bold">Private & Secure Database</h5>
+          <p class="text-muted small">Your data is stored securely in SQLite with hashed passwords and strict session authorization. Zero data leakage.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ATS Showcase Section -->
+<section id="ats" class="py-5">
+  <div class="container py-4">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-6">
+        <div class="card-saas p-4 shadow-sm">
+          <div class="d-flex align-items-center justify-content-between mb-4">
+            <h5 class="fw-bold mb-0">ATS Keyword Benchmark</h5>
+            <span class="badge bg-success-subtle text-success">Passed Screenings</span>
+          </div>
+          <div class="mb-3">
+            <div class="d-flex justify-content-between small fw-semibold mb-1">
+              <span>Section Structure (Summary, Exp, Edu, Skills)</span>
+              <span>100%</span>
+            </div>
+            <div class="progress" style="height: 8px;">
+              <div class="progress-bar bg-success" style="width: 100%;"></div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <div class="d-flex justify-content-between small fw-semibold mb-1">
+              <span>Job Description Keyword Match</span>
+              <span>88%</span>
+            </div>
+            <div class="progress" style="height: 8px;">
+              <div class="progress-bar bg-primary" style="width: 88%;"></div>
+            </div>
+          </div>
+          <div class="mb-3">
+            <div class="d-flex justify-content-between small fw-semibold mb-1">
+              <span>Active Action Verbs</span>
+              <span>92%</span>
+            </div>
+            <div class="progress" style="height: 8px;">
+              <div class="progress-bar bg-info" style="width: 92%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <span class="badge gradient-badge px-3 py-2 rounded-pill mb-2">Recruiter Approved</span>
+        <h2 class="fw-bold mb-3">Beat the Applicant Tracking System</h2>
+        <p class="text-muted mb-4">
+          Over 75% of resumes are filtered out before reaching a human recruiter. ResumeAI ensures clean header hierarchy, standard parsing tags, and targeted keyword density to maximize your interview callbacks.
+        </p>
+        <a href="{{ url_for('ats_checker') }}" class="btn btn-primary">
+          <i class="fa-solid fa-magnifying-glass-chart me-1"></i> Try Free ATS Checker
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ Section -->
+<section id="faq" class="py-5 bg-card">
+  <div class="container py-4">
+    <div class="text-center max-w-700 mx-auto mb-5">
+      <span class="badge gradient-badge px-3 py-2 rounded-pill mb-2">Got Questions?</span>
+      <h2 class="fw-bold">Frequently Asked Questions</h2>
+    </div>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="accordion card-saas p-2" id="faqAccordion">
+          <div class="accordion-item border-0">
+            <h2 class="accordion-header">
+              <button class="accordion-button fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                Does the AI invent fake details or hallucinate jobs?
+              </button>
+            </h2>
+            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
+              <div class="accordion-body text-muted small">
+                No. ResumeAI is engineered with strict system prompts that only synthesize and optimize the candidate's verified inputs. It will never fabricate past employers, degrees, or unmentioned skills.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item border-0">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                Can I switch templates without losing my entered information?
+              </button>
+            </h2>
+            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+              <div class="accordion-body text-muted small">
+                Yes! Your data is preserved in our centralized database structure. You can switch between all 5 templates instantly with one click.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item border-0">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                What if I don't have an OpenRouter API key yet?
+              </button>
+            </h2>
+            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+              <div class="accordion-body text-muted small">
+                ResumeAI includes a full interactive <strong>Demo Mode</strong> that seamlessly demonstrates AI generation and suggestions even before you enter your OpenRouter key.
+              </div>
+            </div>
+          </div>
+
+          <div class="accordion-item border-0">
+            <h2 class="accordion-header">
+              <button class="accordion-button collapsed fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                Can I download and print the resumes as PDF?
+              </button>
+            </h2>
+            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
+              <div class="accordion-body text-muted small">
+                Yes. High-resolution vector A4 PDFs are generated directly on the backend using Python ReportLab for crisp formatting on any printer or screen.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="py-5 border-top bg-card text-muted">
+  <div class="container">
+    <div class="row g-4 justify-content-between">
+      <div class="col-md-4">
+        <a class="d-flex align-items-center gap-2 fw-bold text-decoration-none text-main mb-3" href="{{ url_for('index') }}">
+          <div class="rounded-3 bg-primary text-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+          </div>
+          <span class="fs-5">Resume<span class="text-primary">AI</span></span>
+        </a>
+        <p class="small">
+          Empowering professionals and students worldwide to build recruiter-grade, ATS-ready resumes with smart AI writing assistance.
+        </p>
+      </div>
+
+      <div class="col-6 col-md-2">
+        <h6 class="fw-bold text-main mb-3">Product</h6>
+        <ul class="list-unstyled small d-flex flex-column gap-2">
+          <li><a href="#how-it-works" class="text-muted text-decoration-none">How It Works</a></li>
+          <li><a href="#templates" class="text-muted text-decoration-none">Resume Templates</a></li>
+          <li><a href="{{ url_for('ats_checker') }}" class="text-muted text-decoration-none">ATS Checker</a></li>
+          <li><a href="{{ url_for('cover_letter') }}" class="text-muted text-decoration-none">Cover Letters</a></li>
+        </ul>
+      </div>
+
+      <div class="col-6 col-md-2">
+        <h6 class="fw-bold text-main mb-3">Account</h6>
+        <ul class="list-unstyled small d-flex flex-column gap-2">
+          <li><a href="{{ url_for('login') }}" class="text-muted text-decoration-none">Sign In</a></li>
+          <li><a href="{{ url_for('register') }}" class="text-muted text-decoration-none">Create Account</a></li>
+          <li><a href="{{ url_for('dashboard') }}" class="text-muted text-decoration-none">Dashboard</a></li>
+        </ul>
+      </div>
+
+      <div class="col-md-3">
+        <h6 class="fw-bold text-main mb-3">AI Connection</h6>
+        <div class="d-flex align-items-center gap-2 small">
+          <span class="rounded-circle {% if ai_configured %}bg-success{% else %}bg-warning{% endif %} d-inline-block" style="width: 10px; height: 10px;"></span>
+          <span>{% if ai_configured %}OpenRouter Connected{% else %}Demo Mode Active{% endif %}</span>
+        </div>
+        <p class="small text-muted mt-2">Model: {{ ai_model }}</p>
+      </div>
+    </div>
+
+    <div class="pt-4 mt-4 border-top text-center small">
+      &copy; {{ current_year }} ResumeAI. All rights reserved. Built with Python, Flask, SQLite & OpenRouter.
+    </div>
+  </div>
+</footer>
+{% endblock %}

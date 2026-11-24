@@ -1,0 +1,222 @@
+{% extends 'base.html' %}
+
+{% block title %}ATS Resume Checker – ResumeAI{% endblock %}
+
+{% block body_content %}
+<div class="app-layout">
+  <!-- Collapsible Sidebar -->
+  <aside class="app-sidebar shadow-sm" id="sidebar">
+    <div class="p-4 border-bottom d-flex align-items-center justify-content-between">
+      <a class="d-flex align-items-center gap-2 fw-bold text-decoration-none text-main" href="{{ url_for('dashboard') }}">
+        <div class="rounded-3 bg-primary text-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </div>
+        <span class="fs-5">Resume<span class="text-primary">AI</span></span>
+      </a>
+      <button class="btn btn-sm btn-light d-lg-none" onclick="toggleSidebar()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="p-3 flex-grow-1 overflow-auto">
+      <div class="sidebar-nav">
+        <a href="{{ url_for('dashboard') }}" class="nav-link">
+          <i class="fa-solid fa-table-columns"></i> Dashboard
+        </a>
+        <a href="{{ url_for('resume_create') }}" class="nav-link">
+          <i class="fa-solid fa-circle-plus"></i> Create Resume
+        </a>
+        <a href="{{ url_for('template_gallery') }}" class="nav-link">
+          <i class="fa-solid fa-layer-group"></i> Resume Templates
+        </a>
+        <a href="{{ url_for('ats_checker') }}" class="nav-link active">
+          <i class="fa-solid fa-magnifying-glass-chart"></i> ATS Checker
+        </a>
+        <a href="{{ url_for('cover_letter') }}" class="nav-link">
+          <i class="fa-solid fa-envelope-open-text"></i> Cover Letter AI
+        </a>
+        <a href="{{ url_for('settings') }}" class="nav-link">
+          <i class="fa-solid fa-gear"></i> Settings
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="app-main">
+    <header class="glass-header py-3 px-4 d-flex align-items-center justify-content-between sticky-top">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-outline-secondary btn-sm d-lg-none" onclick="toggleSidebar()">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <h5 class="fw-bold mb-0">ATS Resume Scanner & Keyword Matcher</h5>
+      </div>
+    </header>
+
+    <div class="p-4 max-w-1200 mx-auto">
+      <div class="row g-4 mb-4">
+        <!-- Input Form Column -->
+        <div class="col-lg-5">
+          <div class="card-saas p-4">
+            <h5 class="fw-bold mb-3">Scan Your Resume</h5>
+            <p class="text-muted small mb-4">
+              Upload your PDF resume or paste raw text to inspect section hierarchy, detect essential contact info, and match keywords against a job description.
+            </p>
+
+            <form method="POST" action="{{ url_for('ats_checker') }}" enctype="multipart/form-data">
+              <!-- Upload PDF -->
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Upload PDF Resume (Optional)</label>
+                <input type="file" name="resume_file" class="form-control form-control-sm" accept=".pdf">
+                <div class="form-text small">Accepted format: .pdf up to 16MB</div>
+              </div>
+
+              <!-- Or Paste Text -->
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Or Paste Resume Text</label>
+                <textarea name="resume_text" class="form-control" rows="6" placeholder="Paste your resume text here...">{{ extracted_text or '' }}</textarea>
+              </div>
+
+              <!-- Job Description Target -->
+              <div class="mb-3">
+                <label class="form-label small fw-semibold">Target Job Description (Recommended)</label>
+                <textarea name="job_description" class="form-control" rows="6" placeholder="Paste the job requirements, qualifications, and role responsibilities...">{{ job_description or '' }}</textarea>
+                <div class="form-text small">We'll benchmark your resume's keyword density against this job posting.</div>
+              </div>
+
+              <button type="submit" class="btn btn-primary w-100 py-2">
+                <i class="fa-solid fa-magnifying-glass-chart me-1"></i> Run ATS Analysis
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Analysis Results Column -->
+        <div class="col-lg-7">
+          {% if result %}
+            {% if result.error %}
+              <div class="alert alert-danger card-saas">
+                <i class="fa-solid fa-circle-exclamation me-2"></i> {{ result.error }}
+              </div>
+            {% else %}
+              <div class="card-saas p-4 mb-4">
+                <!-- Score Header -->
+                <div class="d-flex flex-wrap align-items-center justify-content-between border-bottom pb-4 mb-4 gap-3">
+                  <div>
+                    <span class="badge gradient-badge px-3 py-1 rounded-pill mb-1">Automated Evaluation</span>
+                    <h3 class="fw-bold mb-1">Overall ATS Compatibility</h3>
+                    <p class="text-muted small mb-0">Total parsed words: {{ result.word_count }} words</p>
+                  </div>
+
+                  <div class="score-circle" style="--score: {{ result.ats_score }};">
+                    <div class="score-circle-inner">
+                      <span class="fs-4 text-primary">{{ result.ats_score }}</span>
+                      <span class="small text-muted" style="font-size: 10px;">OUT OF 100</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Job Match Stats if provided -->
+                {% if result.job_analysis %}
+                  <div class="bg-primary-subtle border border-primary-subtle p-3 rounded-3 mb-4">
+                    <div class="d-flex align-items-center justify-content-between mb-2">
+                      <strong class="text-primary"><i class="fa-solid fa-bullseye me-1"></i> Job Description Match Rate</strong>
+                      <span class="badge bg-primary fs-6">{{ result.job_analysis.match_rate }}%</span>
+                    </div>
+
+                    <div class="mb-2">
+                      <small class="fw-semibold d-block mb-1">Found Keywords:</small>
+                      <div class="d-flex flex-wrap gap-1">
+                        {% for kw in result.job_analysis.matching_keywords %}
+                          <span class="badge bg-success-subtle text-success">{{ kw }}</span>
+                        {% endfor %}
+                      </div>
+                    </div>
+
+                    {% if result.job_analysis.missing_keywords %}
+                      <div>
+                        <small class="fw-semibold d-block mb-1 text-danger">Missing / Recommended Keywords:</small>
+                        <div class="d-flex flex-wrap gap-1">
+                          {% for kw in result.job_analysis.missing_keywords %}
+                            <span class="badge bg-danger-subtle text-danger">{{ kw }}</span>
+                          {% endfor %}
+                        </div>
+                      </div>
+                    {% endif %}
+                  </div>
+                {% endif %}
+
+                <!-- Section Detection Breakdown -->
+                <h6 class="fw-bold mb-3">Key Section Structure</h6>
+                <div class="row g-2 mb-4">
+                  {% for sec, found in result.detected_sections.items() %}
+                    <div class="col-sm-6">
+                      <div class="p-2 px-3 rounded-2 border d-flex align-items-center justify-content-between {% if found %}bg-success-subtle border-success-subtle{% else %}bg-danger-subtle border-danger-subtle{% endif %}">
+                        <span class="small fw-semibold text-capitalize">{{ sec }}</span>
+                        {% if found %}
+                          <span class="badge bg-success"><i class="fa-solid fa-check"></i> Found</span>
+                        {% else %}
+                          <span class="badge bg-danger"><i class="fa-solid fa-xmark"></i> Missing</span>
+                        {% endif %}
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+
+                <!-- Contact Info Verification -->
+                <h6 class="fw-bold mb-2">Contact Details Check</h6>
+                <div class="d-flex flex-wrap gap-3 mb-4 small text-muted">
+                  <div>
+                    <i class="fa-solid {% if result.contact_info_found.email %}fa-check-circle text-success{% else %}fa-times-circle text-danger{% endif %} me-1"></i> Email Detected
+                  </div>
+                  <div>
+                    <i class="fa-solid {% if result.contact_info_found.phone %}fa-check-circle text-success{% else %}fa-times-circle text-danger{% endif %} me-1"></i> Phone Detected
+                  </div>
+                  <div>
+                    <i class="fa-solid {% if result.contact_info_found.links %}fa-check-circle text-success{% else %}fa-times-circle text-danger{% endif %} me-1"></i> Online Profile Links
+                  </div>
+                </div>
+
+                <!-- Improvement Suggestions -->
+                <h6 class="fw-bold mb-2">Key Improvement Recommendations</h6>
+                <ul class="list-group list-group-flush mb-4">
+                  {% for sug in result.suggestions %}
+                    <li class="list-group-item bg-transparent px-0 text-muted small d-flex align-items-start gap-2">
+                      <i class="fa-solid fa-lightbulb text-warning mt-1"></i>
+                      <div>{{ sug }}</div>
+                    </li>
+                  {% endfor %}
+                </ul>
+
+                <!-- Disclaimer -->
+                <div class="alert alert-light border small text-muted mb-0">
+                  <i class="fa-solid fa-circle-info me-1"></i> {{ result.disclaimer }}
+                </div>
+              </div>
+            {% endif %}
+          {% else %}
+            <!-- Blank State Placeholder -->
+            <div class="card-saas p-5 text-center h-100 d-flex flex-column align-items-center justify-content-center">
+              <div class="rounded-circle bg-primary-light text-primary d-flex align-items-center justify-content-center mb-3" style="width: 72px; height: 72px;">
+                <i class="fa-solid fa-file-magnifying-glass fs-2"></i>
+              </div>
+              <h5 class="fw-bold">No Analysis Yet</h5>
+              <p class="text-muted small max-w-400">
+                Submit your resume and target job description on the left to view comprehensive ATS compatibility scoring and keyword recommendations.
+              </p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('show');
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign In – ResumeAI{% endblock %}
+
+{% block body_content %}
+<div class="min-vh-100 d-flex align-items-center justify-content-center p-3">
+  <div class="card-saas p-4 p-md-5 rounded-4 shadow-lg" style="max-width: 440px; width: 100%;">
+    <div class="text-center mb-4">
+      <a class="d-inline-flex align-items-center gap-2 fw-bold text-decoration-none text-main mb-2" href="{{ url_for('index') }}">
+        <div class="rounded-3 bg-primary text-white d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </div>
+        <span class="fs-4">Resume<span class="text-primary">AI</span></span>
+      </a>
+      <h4 class="fw-bold mt-2">Welcome Back</h4>
+      <p class="text-muted small">Sign in to continue creating and managing your resumes.</p>
+    </div>
+
+    <form method="POST" action="{{ url_for('login') }}">
+      <div class="mb-3">
+        <label class="form-label small fw-semibold">Email Address</label>
+        <div class="input-group">
+          <span class="input-group-text bg-transparent border-end-0 text-muted"><i class="fa-solid fa-envelope"></i></span>
+          <input type="email" name="email" class="form-control border-start-0" placeholder="name@company.com" required autofocus>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <div class="d-flex justify-content-between align-items-center">
+          <label class="form-label small fw-semibold">Password</label>
+        </div>
+        <div class="input-group">
+          <span class="input-group-text bg-transparent border-end-0 text-muted"><i class="fa-solid fa-lock"></i></span>
+          <input type="password" name="password" class="form-control border-start-0" placeholder="••••••••" required>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary w-100 py-2 mt-2">
+        <i class="fa-solid fa-arrow-right-to-bracket me-2"></i> Sign In
+      </button>
+    </form>
+
+    <div class="text-center mt-4 pt-3 border-top small text-muted">
+      Don't have an account? <a href="{{ url_for('register') }}" class="text-primary fw-semibold text-decoration-none">Create free account</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

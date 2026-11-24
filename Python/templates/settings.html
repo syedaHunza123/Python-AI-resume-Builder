@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block title %}Account Settings – ResumeAI{% endblock %}
+
+{% block body_content %}
+<div class="app-layout">
+  <!-- Sidebar -->
+  <aside class="app-sidebar shadow-sm" id="sidebar">
+    <div class="p-4 border-bottom d-flex align-items-center justify-content-between">
+      <a class="d-flex align-items-center gap-2 fw-bold text-decoration-none text-main" href="{{ url_for('dashboard') }}">
+        <div class="rounded-3 bg-primary text-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+        </div>
+        <span class="fs-5">Resume<span class="text-primary">AI</span></span>
+      </a>
+      <button class="btn btn-sm btn-light d-lg-none" onclick="toggleSidebar()">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="p-3 flex-grow-1 overflow-auto">
+      <div class="sidebar-nav">
+        <a href="{{ url_for('dashboard') }}" class="nav-link">
+          <i class="fa-solid fa-table-columns"></i> Dashboard
+        </a>
+        <a href="{{ url_for('resume_create') }}" class="nav-link">
+          <i class="fa-solid fa-circle-plus"></i> Create Resume
+        </a>
+        <a href="{{ url_for('template_gallery') }}" class="nav-link">
+          <i class="fa-solid fa-layer-group"></i> Resume Templates
+        </a>
+        <a href="{{ url_for('ats_checker') }}" class="nav-link">
+          <i class="fa-solid fa-magnifying-glass-chart"></i> ATS Checker
+        </a>
+        <a href="{{ url_for('cover_letter') }}" class="nav-link">
+          <i class="fa-solid fa-envelope-open-text"></i> Cover Letter AI
+        </a>
+        <a href="{{ url_for('settings') }}" class="nav-link active">
+          <i class="fa-solid fa-gear"></i> Settings
+        </a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="app-main">
+    <header class="glass-header py-3 px-4 d-flex align-items-center justify-content-between sticky-top">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-outline-secondary btn-sm d-lg-none" onclick="toggleSidebar()">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <h5 class="fw-bold mb-0">Settings & Profile</h5>
+      </div>
+    </header>
+
+    <div class="p-4 max-w-900 mx-auto">
+      <!-- AI Connection Status Card -->
+      <div class="card-saas p-4 mb-4">
+        <h6 class="fw-bold mb-3 d-flex align-items-center gap-2">
+          <i class="fa-solid fa-network-wired text-primary"></i> OpenRouter AI Status
+        </h6>
+        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+          <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+              <span class="rounded-circle {% if ai_configured %}bg-success{% else %}bg-warning{% endif %} d-inline-block" style="width: 10px; height: 10px;"></span>
+              <strong>{% if ai_configured %}Connected & Operational{% else %}Demo Mode Active{% endif %}</strong>
+            </div>
+            <p class="text-muted small mb-0">Active Model: <code>{{ ai_model }}</code></p>
+          </div>
+          {% if not ai_configured %}
+            <span class="badge bg-warning-subtle text-warning border border-warning-subtle">
+              Provide OPENROUTER_API_KEY in .env for custom AI calls
+            </span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- User Profile Settings -->
+      <div class="card-saas p-4 mb-4">
+        <h6 class="fw-bold mb-3 d-flex align-items-center gap-2">
+          <i class="fa-solid fa-user text-primary"></i> User Profile
+        </h6>
+        <form method="POST" action="{{ url_for('settings') }}">
+          <input type="hidden" name="action" value="update_profile">
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Full Name</label>
+              <input type="text" name="name" class="form-control" value="{{ user.name }}" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Email Address</label>
+              <input type="email" name="email" class="form-control" value="{{ user.email }}" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-sm">
+            <i class="fa-solid fa-check me-1"></i> Save Changes
+          </button>
+        </form>
+      </div>
+
+      <!-- Change Password -->
+      <div class="card-saas p-4 mb-4">
+        <h6 class="fw-bold mb-3 d-flex align-items-center gap-2">
+          <i class="fa-solid fa-lock text-primary"></i> Security & Password
+        </h6>
+        <form method="POST" action="{{ url_for('settings') }}">
+          <input type="hidden" name="action" value="change_password">
+          <div class="mb-3">
+            <label class="form-label small fw-semibold">Current Password</label>
+            <input type="password" name="current_password" class="form-control" placeholder="••••••••" required>
+          </div>
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">New Password</label>
+              <input type="password" name="new_password" class="form-control" placeholder="At least 6 characters" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label small fw-semibold">Confirm New Password</label>
+              <input type="password" name="confirm_password" class="form-control" placeholder="Repeat new password" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-outline-primary btn-sm">
+            <i class="fa-solid fa-key me-1"></i> Update Password
+          </button>
+        </form>
+      </div>
+
+      <!-- Theme Preferences -->
+      <div class="card-saas p-4 mb-4">
+        <h6 class="fw-bold mb-3 d-flex align-items-center gap-2">
+          <i class="fa-solid fa-palette text-primary"></i> Theme Settings
+        </h6>
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <strong>Appearance Mode</strong>
+            <div class="text-muted small">Switch between crisp light mode and sleek SaaS dark mode.</div>
+          </div>
+          <button class="btn btn-outline-secondary btn-sm" onclick="toggleTheme()">
+            <i class="fa-solid fa-moon theme-icon me-1"></i> Toggle Theme
+          </button>
+        </div>
+      </div>
+
+      <!-- Delete Account (Danger Zone) -->
+      <div class="card-saas p-4 border-danger-subtle bg-danger-subtle mb-4">
+        <h6 class="fw-bold text-danger mb-2 d-flex align-items-center gap-2">
+          <i class="fa-solid fa-triangle-exclamation"></i> Danger Zone
+        </h6>
+        <p class="small text-muted mb-3">
+          Deleting your account will permanently remove all your saved resumes, cover letters, and personal information from the database. This action is irreversible.
+        </p>
+        <form method="POST" action="{{ url_for('settings') }}" onsubmit="return confirm('Are you completely sure you want to permanently delete your account?');">
+          <input type="hidden" name="action" value="delete_account">
+          <div class="input-group" style="max-width: 400px;">
+            <input type="text" name="confirm_delete" class="form-control form-control-sm" placeholder="Type DELETE to confirm" required>
+            <button type="submit" class="btn btn-danger btn-sm">
+              <i class="fa-solid fa-trash me-1"></i> Delete Account
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('show');
+  }
+</script>
+{% endblock %}

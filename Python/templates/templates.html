@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block title %}Resume Templates – ResumeAI{% endblock %}
+
+{% block body_content %}
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg glass-header sticky-top">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2 fw-bold" href="{{ url_for('index') }}">
+      <div class="rounded-3 bg-primary text-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+      </div>
+      <span>Resume<span class="text-primary">AI</span></span>
+    </a>
+    <div class="d-flex align-items-center gap-2">
+      {% if session.get('user_id') %}
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-primary btn-sm">
+          <i class="fa-solid fa-table-columns me-1"></i> Dashboard
+        </a>
+      {% else %}
+        <a href="{{ url_for('login') }}" class="btn btn-outline-primary btn-sm">Sign In</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+<div class="container py-5">
+  <div class="text-center mb-5">
+    <span class="badge gradient-badge px-3 py-2 rounded-pill mb-2">Curated Designs</span>
+    <h1 class="fw-bold">Explore Our Resume Templates</h1>
+    <p class="text-muted max-w-600 mx-auto">
+      Each template is crafted according to modern recruitment standards, clean typographic hierarchies, and ATS keyword parsing guidelines.
+    </p>
+  </div>
+
+  <div class="row g-4 justify-content-center">
+    <!-- 1. Modern -->
+    <div class="col-md-6 col-lg-4">
+      <div class="card-saas h-100 d-flex flex-column justify-content-between p-4">
+        <div>
+          <div class="p-3 bg-light rounded border mb-3 text-start" style="min-height: 200px;">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <div class="rounded-circle bg-primary" style="width: 24px; height: 24px;"></div>
+              <div>
+                <strong class="d-block small text-primary">Modern Professional</strong>
+                <span class="text-muted" style="font-size: 10px;">Primary colored accent bar</span>
+              </div>
+            </div>
+            <div class="bg-white p-2 rounded shadow-sm border mb-2 small" style="font-size: 11px;">
+              <strong>Summary</strong><br>
+              Experienced engineer delivering robust scalable systems.
+            </div>
+            <div class="bg-white p-2 rounded shadow-sm border small" style="font-size: 11px;">
+              <strong>Experience</strong><br>
+              Senior Developer • Tech Corp (2021-Present)
+            </div>
+          </div>
+          <h5 class="fw-bold">1. Modern Professional</h5>
+          <p class="text-muted small">Balanced two-tone accent header with bold typography. Universally acclaimed for technology, corporate, and product roles.</p>
+        </div>
+        <a href="{{ url_for('resume_create', template='modern') }}" class="btn btn-primary w-100">Use Modern Template</a>
+      </div>
+    </div>
+
+    <!-- 2. Minimal -->
+    <div class="col-md-6 col-lg-4">
+      <div class="card-saas h-100 d-flex flex-column justify-content-between p-4">
+        <div>
+          <div class="p-3 bg-light rounded border mb-3 text-center font-serif" style="min-height: 200px;">
+            <div class="fw-bold text-dark mb-1">JANE DOE</div>
+            <div class="text-muted mb-2" style="font-size: 10px;">jane@example.com • 555-0192 • New York, NY</div>
+            <hr class="my-2">
+            <div class="text-start bg-white p-2 rounded shadow-sm border small" style="font-size: 11px;">
+              <span class="fw-bold">EDUCATION</span><br>
+              Columbia University – B.A. Economics
+            </div>
+          </div>
+          <h5 class="fw-bold">2. Minimal Clean</h5>
+          <p class="text-muted small">Timeless, single-column serif presentation. Maximum compatibility across legacy government, banking, and academic applicant tracking systems.</p>
+        </div>
+        <a href="{{ url_for('resume_create', template='minimal') }}" class="btn btn-primary w-100">Use Minimal Template</a>
+      </div>
+    </div>
+
+    <!-- 3. Corporate -->
+    <div class="col-md-6 col-lg-4">
+      <div class="card-saas h-100 d-flex flex-column justify-content-between p-4">
+        <div>
+          <div class="p-3 bg-light rounded border mb-3 text-start" style="min-height: 200px; border-left: 8px solid #1e293b !important;">
+            <div class="fw-bold text-dark">MICHAEL SMITH</div>
+            <span class="badge bg-dark mb-2" style="font-size: 9px;">Director of Product Strategy</span>
+            <div class="bg-white p-2 rounded shadow-sm border small" style="font-size: 11px;">
+              <strong>LEADERSHIP EXPERIENCE</strong><br>
+              VP Operations • Global Logistics Ltd
+            </div>
+          </div>
+          <h5 class="fw-bold">3. Corporate Executive</h5>
+          <p class="text-muted small">Structured divider borders and authoritative weight designed for managers, executives, and consultants.</p>
+        </div>
+        <a href="{{ url_for('resume_create', template='corporate') }}" class="btn btn-primary w-100">Use Corporate Template</a>
+      </div>
+    </div>
+
+    <!-- 4. Creative -->
+    <div class="col-md-6 col-lg-4">
+      <div class="card-saas h-100 d-flex flex-column justify-content-between p-4">
+        <div>
+          <div class="p-3 bg-light rounded border mb-3 text-start" style="min-height: 200px;">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <strong class="text-primary">Sarah Jenkins</strong>
+              <span class="badge bg-primary-subtle text-primary" style="font-size: 9px;">Creative Lead</span>
+            </div>
+            <div class="d-flex gap-1 mb-2">
+              <span class="badge bg-secondary-subtle text-secondary" style="font-size: 9px;">Figma</span>
+              <span class="badge bg-secondary-subtle text-secondary" style="font-size: 9px;">Design Systems</span>
+            </div>
+            <div class="bg-white p-2 rounded shadow-sm border small" style="font-size: 11px;">
+              Portfolio: sarahdesigns.io
+            </div>
+          </div>
+          <h5 class="fw-bold">4. Creative Dynamic</h5>
+          <p class="text-muted small">Highlights design portfolio links, skill tags, and modern aesthetics. Ideal for UI/UX, marketing, and media roles.</p>
+        </div>
+        <a href="{{ url_for('resume_create', template='creative') }}" class="btn btn-primary w-100">Use Creative Template</a>
+      </div>
+    </div>
+
+    <!-- 5. Technical -->
+    <div class="col-md-6 col-lg-4">
+      <div class="card-saas h-100 d-flex flex-column justify-content-between p-4">
+        <div>
+          <div class="p-3 bg-dark text-light rounded border mb-3 text-start font-monospace" style="min-height: 200px; font-size: 11px;">
+            <div class="text-info">> dev.profile(David Chen)</div>
+            <div class="text-warning">Languages: Python, Go, TypeScript</div>
+            <div class="mt-2 bg-secondary p-1 rounded text-white" style="font-size: 9px;">
+              Repos: github.com/dchen/microservice-mesh
+            </div>
+          </div>
+          <h5 class="fw-bold">5. Developer / Technical</h5>
+          <p class="text-muted small">Engineered specifically for software engineers, devops practitioners, and data scientists with emphasis on technical stack and GitHub links.</p>
+        </div>
+        <a href="{{ url_for('resume_create', template='technical') }}" class="btn btn-primary w-100">Use Technical Template</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
